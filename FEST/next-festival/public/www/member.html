@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plaza Festival - Show Barcode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .nav-item.active {
+            color: #93cf44;
+            border-bottom: 3px solid #93cf44;
+        }
+        .user-popup {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .user-popup.show {
+            transform: translateX(0);
+        }
+        .facility-card.selected {
+            border: 2px solid #93cf44;
+            background-color: #eff6ff;
+        }
+        .time-slot.selected {
+            background-color: #93cf44;
+            color: white;
+        }
+        .time-slot.disabled {
+            background-color: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .date-selector::-webkit-scrollbar {
+            display: none;
+        }
+        .date-selector {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .date-item.selected {
+            background-color: #93cf44;
+            color: white;
+        }
+        .summary-panel {
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .summary-panel.show {
+            transform: translateY(0);
+        }
+        .barcode-container {
+            position: relative;
+        }
+        .barcode-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0));
+            z-index: 1;
+            pointer-events: none;
+        }
+        .barcode-container::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0));
+            z-index: 1;
+            pointer-events: none;
+        }
+        .membership-card {
+            background: linear-gradient(135deg, #93cf44 0%, #2563eb 100%);
+        }
+        .tab.active {
+            color: #93cf44;
+            border-bottom: 2px solid #93cf44;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-green-50 to-white">
+    <!-- Header with Logo and User Icon -->
+    <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-30">
+        <div class="flex justify-between items-center px-4 py-3">
+            <button id="userMenuBtn" class="text-green-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <div class="text-center">
+                                <img src="Logo.png" alt="logo" srcset="Logo.png" class="h-10 w-auto inline-block">
+            </div>
+        </div>
+    </header>
+
+    <!-- User Popup Menu -->
+    <div id="userPopup" class="user-popup fixed top-0 left-0 h-full w-3/4 bg-white shadow-lg z-40 p-5">
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center">
+                <div class="bg-green-600 rounded-full h-12 w-12 flex items-center justify-center text-white text-xl font-bold">
+                    J
+                </div>
+                <div class="ml-3">
+                    <p class="font-semibold">John Doe</p>
+                    <p class="text-sm text-gray-500">john.doe@email.com</p>
+                </div>
+            </div>
+            <button id="closePopupBtn" class="text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <nav class="mt-8">
+            <ul>
+                <li class="mb-4">
+                    <a href="./Booking.html" class="flex items-center p-2 hover:bg-green-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Booking
+                    </a>
+                </li>
+                <li class="mb-4">
+                    <a href="./member.html" class="flex items-center p-2 hover:bg-green-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        Show Barcode
+                    </a>
+                </li>
+                <li class="mb-4">
+                    <a href="./tiket.html" class="flex items-center p-2 hover:bg-green-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                        </svg>
+                        Your Ticket
+                    </a>
+                </li>
+                <li class="mb-4">
+                    <a href="./transaksi.html" class="flex items-center p-2 hover:bg-green-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                        Transaction
+                    </a>
+                </li>
+                <li class="mb-4">
+                    <a href="./setting.html" class="flex items-center p-2 hover:bg-green-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Overlay for popup -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+
+    <!-- Main Navigation -->
+    <nav class="bg-white shadow-md fixed bottom-0 left-0 right-0 z-20">
+        <div class="flex justify-around items-center">
+            <a href="#" class="nav-item flex flex-col items-center py-2 px-4 text-sm text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item flex flex-col items-center py-2 px-4 text-sm text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Booking</span>
+            </a>
+            <a href="#" class="nav-item active flex flex-col items-center py-2 px-4 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+                <span>Barcode</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-16 pb-20 px-4">
+        <!-- Page Title -->
+        <div class="mb-6">
+            <h1 class="text-xl font-bold text-gray-800">Membership Barcode</h1>
+            <p class="text-gray-600 text-sm">Show this barcode to access Plaza Festival facilities</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-200 mb-6">
+            <button class="tab active flex-1 py-3 text-center font-medium">
+                Membership
+            </button>
+            <button class="tab flex-1 py-3 text-center font-medium text-gray-500">
+                History
+            </button>
+        </div>
+
+        <!-- Membership Card -->
+        <div class="membership-card rounded-xl shadow-lg p-5 mb-6 text-white">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h2 class="text-lg font-bold">Plaza Festival</h2>
+                    <p class="text-sm opacity-80">Premium Membership</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-lg p-1.5">
+                    <svg class="h-6 w-6" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 8L20 32L30 8M15 20H25" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M35 8H45C50 8 55 12 55 18C55 24 50 28 45 28H35V8Z" fill="white"/>
+                        <path d="M60 8H85V16H60V8Z" fill="white"/>
+                        <path d="M60 20H80V28H60V20Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <p class="text-xs opacity-80">Member Name</p>
+                    <p class="font-semibold">John Doe</p>
+                </div>
+                <div>
+                    <p class="text-xs opacity-80">Member ID</p>
+                    <p class="font-semibold">PF-2023-0042</p>
+                </div>
+            </div>
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-xs opacity-80">Valid Until</p>
+                    <p class="font-semibold">31 Dec 2023</p>
+                </div>
+                <div>
+                    <p class="text-xs opacity-80">Membership Type</p>
+                    <p class="font-semibold">Premium</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barcode Section -->
+        <div class="bg-white rounded-xl shadow-md p-5 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-gray-800">Membership Barcode</h3>
+                <button class="text-green-600 text-sm font-medium flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Save
+                </button>
+            </div>
+            
+            <div class="barcode-container flex flex-col items-center justify-center py-6 px-4 bg-white rounded-lg border border-gray-200">
+                <!-- SVG Barcode -->
+                <svg class="w-full h-48 mb-4" viewBox="0 0 200 100">
+                    <!-- Barcode lines -->
+                    <rect x="10" y="10" width="2" height="80" fill="black" />
+                    <rect x="14" y="10" width="1" height="80" fill="black" />
+                    <rect x="17" y="10" width="3" height="80" fill="black" />
+                    <rect x="22" y="10" width="2" height="80" fill="black" />
+                    <rect x="26" y="10" width="4" height="80" fill="black" />
+                    <rect x="32" y="10" width="1" height="80" fill="black" />
+                    <rect x="35" y="10" width="3" height="80" fill="black" />
+                    <rect x="40" y="10" width="2" height="80" fill="black" />
+                    <rect x="44" y="10" width="1" height="80" fill="black" />
+                    <rect x="47" y="10" width="4" height="80" fill="black" />
+                    <rect x="53" y="10" width="2" height="80" fill="black" />
+                    <rect x="57" y="10" width="3" height="80" fill="black" />
+                    <rect x="62" y="10" width="1" height="80" fill="black" />
+                    <rect x="65" y="10" width="2" height="80" fill="black" />
+                    <rect x="69" y="10" width="4" height="80" fill="black" />
+                    <rect x="75" y="10" width="1" height="80" fill="black" />
+                    <rect x="78" y="10" width="3" height="80" fill="black" />
+                    <rect x="83" y="10" width="2" height="80" fill="black" />
+                    <rect x="87" y="10" width="1" height="80" fill="black" />
+                    <rect x="90" y="10" width="4" height="80" fill="black" />
+                    <rect x="96" y="10" width="2" height="80" fill="black" />
+                    <rect x="100" y="10" width="3" height="80" fill="black" />
+                    <rect x="105" y="10" width="1" height="80" fill="black" />
+                    <rect x="108" y="10" width="2" height="80" fill="black" />
+                    <rect x="112" y="10" width="4" height="80" fill="black" />
+                    <rect x="118" y="10" width="1" height="80" fill="black" />
+                    <rect x="121" y="10" width="3" height="80" fill="black" />
+                    <rect x="126" y="10" width="2" height="80" fill="black" />
+                    <rect x="130" y="10" width="1" height="80" fill="black" />
+                    <rect x="133" y="10" width="4" height="80" fill="black" />
+                    <rect x="139" y="10" width="2" height="80" fill="black" />
+                    <rect x="143" y="10" width="3" height="80" fill="black" />
+                    <rect x="148" y="10" width="1" height="80" fill="black" />
+                    <rect x="151" y="10" width="2" height="80" fill="black" />
+                    <rect x="155" y="10" width="4" height="80" fill="black" />
+                    <rect x="161" y="10" width="1" height="80" fill="black" />
+                    <rect x="164" y="10" width="3" height="80" fill="black" />
+                    <rect x="169" y="10" width="2" height="80" fill="black" />
+                    <rect x="173" y="10" width="1" height="80" fill="black" />
+                    <rect x="176" y="10" width="4" height="80" fill="black" />
+                    <rect x="182" y="10" width="2" height="80" fill="black" />
+                    <rect x="186" y="10" width="3" height="80" fill="black" />
+                </svg>
+                
+                <p class="text-gray-800 font-mono text-lg mb-1">PF-2023-0042</p>
+                <p class="text-gray-500 text-sm">Scan to verify membership</p>
+            </div>
+        </div>
+
+        <!-- Member Details -->
+        <div class="bg-white rounded-xl shadow-md p-5 mb-6">
+            <h3 class="font-semibold text-gray-800 mb-4">Member Details</h3>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Full Name</span>
+                    <span class="font-medium text-gray-800">John Doe</span>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Email</span>
+                    <span class="font-medium text-gray-800">john.doe@email.com</span>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Phone</span>
+                    <span class="font-medium text-gray-800">+62 812-3456-7890</span>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Date of Birth</span>
+                    <span class="font-medium text-gray-800">15 May 1985</span>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Member Since</span>
+                    <span class="font-medium text-gray-800">10 Jan 2023</span>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Membership Type</span>
+                    <span class="font-medium text-green-600">Premium</span>
+                </div>
+                
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Status</span>
+                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Membership Benefits -->
+        <div class="bg-white rounded-xl shadow-md p-5 mb-6">
+            <h3 class="font-semibold text-gray-800 mb-4">Membership Benefits</h3>
+            
+            <ul class="space-y-3">
+                <li class="flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="text-gray-700">Priority booking for all facilities</span>
+                </li>
+                <li class="flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="text-gray-700">20% discount on all bookings</span>
+                </li>
+                <li class="flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="text-gray-700">Free access to swimming pool on weekdays</span>
+                </li>
+                <li class="flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="text-gray-700">Exclusive access to member events</span>
+                </li>
+                <li class="flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="text-gray-700">Bring a guest for free once a month</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <button class="bg-green-600 text-white rounded-lg py-3 font-medium">
+                Renew Membership
+            </button>
+            <button class="bg-white text-green-600 border border-green-600 rounded-lg py-3 font-medium">
+                Contact Support
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // User popup functionality
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const closePopupBtn = document.getElementById('closePopupBtn');
+        const userPopup = document.getElementById('userPopup');
+        const overlay = document.getElementById('overlay');
+
+        userMenuBtn.addEventListener('click', () => {
+            userPopup.classList.add('show');
+            overlay.classList.remove('hidden');
+        });
+
+        closePopupBtn.addEventListener('click', () => {
+            userPopup.classList.remove('show');
+            overlay.classList.add('hidden');
+        });
+
+        overlay.addEventListener('click', () => {
+            userPopup.classList.remove('show');
+            overlay.classList.add('hidden');
+        });
+
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.classList.add('text-gray-500');
+                });
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                tab.classList.remove('text-gray-500');
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93f2fcdaa68f9c35',t:'MTc0NzE0ODAzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
