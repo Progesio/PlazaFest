@@ -64,3 +64,21 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+```
+CREATE VIEW custom_view AS
+            SELECT 
+              sf.id,
+              sf.idfacility,
+              sf.name AS nama_fasilitas,
+              sf.pricehours,
+              sf.description,
+              sf.banner AS list_sf,
+              f.benner AS list_f,
+              f.nama AS f_type,
+              f.additional AS f_additional,
+              sf.additional AS sf_additional
+            FROM sub_facility AS sf
+            JOIN facility AS f ON sf.idfacility = f.id;
+```
