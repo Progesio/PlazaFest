@@ -82,3 +82,18 @@ CREATE VIEW custom_view AS
             FROM sub_facility AS sf
             JOIN facility AS f ON sf.idfacility = f.id;
 ```
+
+```
+CREATE VIEW listsuccesstransction AS
+SELECT 
+t.id as t_id, 
+y.id as y_id,
+callback,
+barcode,
+time_start,
+y.barcode_expaired,
+y.time_callback,
+t.status
+FROM transaction AS t
+JOIN yum_transaction AS y ON y.id_transaction = t.id;
+```
