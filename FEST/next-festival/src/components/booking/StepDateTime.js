@@ -1,6 +1,28 @@
+import {getlistFasility} from "../../hooks/getlistFasility";
+function listFasility(params) {
+  let facilities = getlistFasility();
+  if (facilities.length === 0) {
+    return [];
+  }
+  console.log("listFasility", facilities);
+  return facilities.map((f) => ({
+    key: f.key,
+    name: f.nama,
+    additional: f.additional,
+    bg: f.bg? f.bg : "bg-gray-100",
+    svg: f.benner[0],
+  }));
+}
+
+
+
 export default function StepDateTime({
-  selectedFacility, facilityObj, dates, selectedDate, onDateClick, TIME_SLOTS, selectedSlots, onSlotClick, clearSlots, goToStep, onNext
+  selectedFacility, dates, selectedDate, onDateClick, selectedSlots, onSlotClick, clearSlots, goToStep, onNext
 }) {
+  // Fetch facilities and find the selected one
+  const facilities = getlistFasility();
+  const facilityObj = facilities.find(f => f.id === selectedFacility);
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -22,7 +44,7 @@ export default function StepDateTime({
         </div>
         <div>
           <p className="text-sm text-gray-600">Selected Facility</p>
-          <p id="selectedFacilityName" className="font-medium text-gray-800">{facilityObj?.name}</p>
+          <p id="selectedFacilityName" className="font-medium text-gray-800">{facilityObj?.nama}</p>
         </div>
       </div>
       {/* Date Selection */}
