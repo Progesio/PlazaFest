@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Filesystem Disk
@@ -29,17 +28,16 @@ return [
     */
 
     'disks' => [
-
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
+            'root' => public_path('lgarin211'),
             'throw' => false,
         ],
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'root' => public_path('lgarin211'),
+            'url' => env('APP_URL').'/lgarin211',
             'visibility' => 'public',
             'throw' => false,
         ],
@@ -55,7 +53,6 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
-
     ],
 
     /*
@@ -72,5 +69,4 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],
-
 ];
